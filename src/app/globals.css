@@ -1,0 +1,193 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------------------
+   Self-hosted variable fonts (no third-party font CDN at runtime)
+   --------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Playfair Display Variable';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('../fonts/playfair-latin.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F,
+    U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Playfair Display Variable';
+  font-style: italic;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('../fonts/playfair-latin-italic.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F,
+    U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../fonts/inter-latin.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F,
+    U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  --font-display: 'Playfair Display Variable', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --midnight: #0b0713;
+  --rose: #ff4d8d;
+  --violet: #a855f7;
+  --gold: #ffd9a0;
+
+  color-scheme: dark;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--midnight);
+  color: rgb(237 231 246);
+  font-family: var(--font-body);
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  min-height: 100dvh;
+}
+
+/* Visible, on-brand keyboard focus for every interactive element. */
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+::selection {
+  background: rgba(255, 77, 141, 0.35);
+  color: #fff;
+}
+
+/* ---------------------------------------------------------------------------
+   Reusable surface + button primitives
+   --------------------------------------------------------------------------- */
+@layer components {
+  .glass {
+    @apply rounded-3xl border border-white/10 bg-white/[0.045] shadow-glass backdrop-blur-xl;
+    background-image: linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.07) 0%,
+      rgba(255, 255, 255, 0.025) 42%,
+      rgba(168, 85, 247, 0.045) 100%
+    );
+  }
+
+  .glass-soft {
+    @apply rounded-2xl border border-white/[0.07] bg-white/[0.03] backdrop-blur-md;
+  }
+
+  .pill {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition duration-200;
+  }
+
+  .btn-primary {
+    @apply pill relative overflow-hidden bg-gradient-to-r from-rose-deep via-rose to-rose-soft text-white shadow-[0_10px_30px_-10px_rgba(255,77,141,0.9)];
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    @apply shadow-[0_14px_40px_-8px_rgba(255,77,141,0.85)] brightness-110;
+  }
+
+  .btn-ghost {
+    @apply pill border border-white/15 bg-white/[0.04] text-white/85 hover:border-white/30 hover:bg-white/[0.08] hover:text-white;
+  }
+
+  .btn-gold {
+    @apply pill border border-gold/40 bg-gold/10 text-gold hover:bg-gold/20;
+  }
+
+  .field-label {
+    @apply mb-2 block text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-white/55;
+  }
+
+  .text-input {
+    @apply w-full rounded-2xl border border-white/10 bg-midnight-deep/60 px-4 py-3 text-base text-white placeholder:text-white/25 transition focus:border-rose/60 focus:outline-none focus:ring-2 focus:ring-rose/25;
+  }
+
+  .section-title {
+    @apply font-display text-[clamp(1.6rem,6vw,2.6rem)] font-medium leading-tight tracking-tight text-white;
+  }
+
+  .hairline {
+    @apply h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent;
+  }
+
+  .shimmer-text {
+    background: linear-gradient(
+      100deg,
+      rgba(255, 217, 160, 0.85) 20%,
+      rgba(255, 255, 255, 1) 45%,
+      rgba(255, 217, 160, 0.85) 70%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+/* Slim, unobtrusive scrollbar */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0b0713;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(168, 85, 247, 0.28);
+    border-radius: 999px;
+    border: 2px solid #0b0713;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Reduced motion: strip decorative animation, keep everything usable
+   --------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Utility for screen-reader-only text */
+.sr-only-focusable:not(:focus):not(:focus-within) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
