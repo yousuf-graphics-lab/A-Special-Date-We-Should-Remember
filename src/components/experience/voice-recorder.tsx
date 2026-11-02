@@ -277,7 +277,7 @@ export function VoiceRecorder({
             <motion.div key="recorded" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
               <div className="rounded-[12px] border border-gold/30 bg-white/55 p-4">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-[0.65rem] uppercase tracking-[0.22em] text-wine/60">Listen before you share</p>
+                  <p className="text-[0.65rem] uppercase tracking-[0.22em] text-wine/60">{copy.listen}</p>
                   <span className="font-display text-[0.86rem] tabular-nums text-ink-soft">{formatDuration(duration)}</span>
                 </div>
                 <audio controls src={audioUrl} className="mt-2">

@@ -1,8 +1,8 @@
 'use client';
 
-import { useId, useRef } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, ImagePlus, Lock, Plus, Trash2, Upload } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ImagePlus, Lock, Plus, Trash2, Upload, X } from 'lucide-react';
 import { OPTIONAL_COPY } from '@/lib/content';
 import type { PublicMediaItem } from '@/lib/responses';
 
@@ -43,7 +43,17 @@ export function PhotoUploader({
   const copy = OPTIONAL_COPY.photos;
   const inputRef = useRef<HTMLInputElement>(null);
   const replaceInputs = useRef<Record<string, HTMLInputElement | null>>({});
+  const [viewing, setViewing] = useState<{ url: string; label: string } | null>(null);
   const total = items.length + existing.length;
+
+  useEffect(() => {
+    if (!viewing) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setViewing(null);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [viewing]);
   const remaining = Math.max(0, MAX_PHOTOS - total);
   const consentId = useId();
 
@@ -82,8 +92,15 @@ export function PhotoUploader({
             key={photo.id}
             className="group relative aspect-[4/5] overflow-hidden rounded-[12px] border border-gold/30 bg-white/50"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={photo.url} alt={`Shared photo ${index + 1}`} className="h-full w-full object-cover" />
+            <button
+              type="button"
+              onClick={() => setViewing({ url: photo.url, label: `Shared photo ${index + 1}` })}
+              className="block h-full w-full"
+              aria-label={`Preview shared photo ${index + 1}`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={photo.url} alt={`Shared photo ${index + 1}`} className="h-full w-full object-cover" />
+            </button>
             <span className="absolute left-2 top-2 rounded-full bg-wine/80 px-2 py-0.5 text-[0.55rem] uppercase tracking-[0.16em] text-white/90">
               shared
             </span>
@@ -109,8 +126,15 @@ export function PhotoUploader({
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
               className="group relative aspect-[4/5] overflow-hidden rounded-[12px] border border-gold/30 bg-white/50"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={item.url} alt={item.name || `Your photo ${index + 1}`} className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={() => setViewing({ url: item.url, label: item.name || `Your photo ${index + 1}` })}
+                className="block h-full w-full"
+                aria-label={`Preview ${item.name || `photo ${index + 1}`}`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={item.url} alt={item.name || `Your photo ${index + 1}`} className="h-full w-full object-cover" />
+              </button>
               <span className="absolute left-2 top-2 rounded-full bg-white/85 px-2 py-0.5 text-[0.55rem] uppercase tracking-[0.16em] text-wine/80">
                 {index + 1}
               </span>
@@ -225,6 +249,33 @@ export function PhotoUploader({
         <p role="alert" className="mt-3 text-[0.82rem] text-[#8E3F3F]">
           {error}
         </p>
+      )}
+
+      {viewing && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#2A1A20]/70 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label={viewing.label}
+          onClick={() => setViewing(null)}
+        >
+          <div className="relative max-h-[88svh] w-full max-w-[36rem]" onClick={(event) => event.stopPropagation()}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={viewing.url}
+              alt={viewing.label}
+              className="max-h-[84svh] w-full rounded-[12px] object-contain shadow-2xl"
+            />
+            <button
+              type="button"
+              onClick={() => setViewing(null)}
+              className="absolute -top-2 right-0 flex h-9 w-9 -translate-y-full items-center justify-center rounded-full bg-white/85 text-wine shadow"
+              aria-label="Close preview"
+            >
+              <X className="h-4 w-4" strokeWidth={1.8} />
+            </button>
+          </div>
+        </div>
       )}
 
       {total === 0 && <p className="mt-4 text-[0.78rem] leading-relaxed text-ink-soft/60">{copy.emptyHint}</p>}

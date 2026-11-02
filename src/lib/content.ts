@@ -256,6 +256,7 @@ export const OPTIONAL_COPY = {
     record: 'Record Voice',
     stop: 'Stop Recording',
     listen: 'Listen to Recording',
+    listenHint: 'Listen to Recording',
     remove: 'Delete Recording',
     again: 'Record Again',
     submit: 'Submit Voice Message',
