@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useAnimation, useReducedMotion } from 'framer-
 import { Heart } from 'lucide-react';
 import { LOCK_COPY, isBirthdayAnswer } from '@/lib/content';
 import { Ambience } from './ambience';
+import { BloomBurst } from './bloom';
 import { HeartLockArt } from './heart-lock';
 import { Ornament } from './ornaments';
 import { useMusic } from './music';
@@ -86,8 +87,9 @@ export function LockScreen({ onUnlocked }: { onUnlocked: () => void }) {
 
           <p className="display-sub mt-4 max-w-md text-ink/80">{LOCK_COPY.subtitle}</p>
 
+          <div className="relative mt-7 sm:mt-9">
+            {unlocking && <BloomBurst count={7} className="left-1/2 top-1/2 h-0 w-0" />}
           <motion.div
-            className="mt-7 sm:mt-9"
             animate={
               unlocking
                 ? { scale: reduce ? 1 : 1.06, opacity: 0.96 }
@@ -100,6 +102,7 @@ export function LockScreen({ onUnlocked }: { onUnlocked: () => void }) {
               className="h-[104px] w-[104px] sm:h-[126px] sm:w-[126px]"
             />
           </motion.div>
+          </div>
 
           <p className="prose-body mt-5 max-w-[27rem] text-balance text-[0.92rem] sm:text-[0.98rem]">
             {LOCK_COPY.hint}

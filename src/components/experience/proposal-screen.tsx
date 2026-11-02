@@ -1,26 +1,19 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import { PROPOSAL_COPY } from '@/lib/content';
 import { apiPost } from '@/lib/api-client';
 import { Ambience } from './ambience';
 import { CoupleArt } from './couple';
 import { Ornament } from './ornaments';
+import { Celebration } from './celebration';
+import { WanderingNo } from './wandering-no';
 
 type View = 'question' | 'declined' | 'farewell';
 
 const MAX_DODGES = 3;
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
-}
-
-function seeded(index: number, salt = 1) {
-  const x = Math.sin(index * 12.9898 * salt) * 43758.5453;
-  return x - Math.floor(x);
-}
 
 export function ProposalScreen({
   onAccept,
@@ -39,21 +32,15 @@ export function ProposalScreen({
   const [pressedNo, setPressedNo] = useState(false);
   const reduce = useReducedMotion();
 
-  const wrapRef = useRef<HTMLDivElement>(null);
   const yesRef = useRef<HTMLButtonElement>(null);
-  const noRef = useRef<HTMLButtonElement>(null);
-  const noX = useMotionValue(0);
-  const noY = useMotionValue(0);
-  const noSpringX = useSpring(noX, { stiffness: 240, damping: 20, mass: 0.6 });
-  const noSpringY = useSpring(noY, { stiffness: 240, damping: 20, mass: 0.6 });
-  const movedRef = useRef({ x: 0, y: 0 });
   const dodgesRef = useRef(0);
+  const [wandering, setWandering] = useState(false);
 
   const settled = dodges >= MAX_DODGES;
 
   useEffect(() => {
     if (!celebrating) return;
-    const timer = setTimeout(onAccept, reduce ? 600 : 2400);
+    const timer = setTimeout(onAccept, reduce ? 600 : 2700);
     return () => clearTimeout(timer);
   }, [celebrating, onAccept, reduce]);
 
@@ -62,74 +49,33 @@ export function ProposalScreen({
     await apiPost('/api/proposal', { answer }).catch(() => null);
   }, []);
 
-  const dodge = useCallback(() => {
+  const handleWander = useCallback(() => {
     if (dodgesRef.current >= MAX_DODGES) return;
-    const wrap = wrapRef.current;
-    const no = noRef.current;
-    const yes = yesRef.current;
-    if (!wrap || !no || !yes) return;
-
-    const wrapRect = wrap.getBoundingClientRect();
-    const noRect = no.getBoundingClientRect();
-    const yesRect = yes.getBoundingClientRect();
-
-    const maxX = Math.max(28, (wrapRect.width - noRect.width) / 2 - 6);
-    const maxY = Math.max(26, (wrapRect.height - noRect.height) / 2 - 4);
-
-    let best: { x: number; y: number; overlaps: boolean } | null = null;
-
-    for (let attempt = 0; attempt < 16; attempt += 1) {
-      const candidateX = clamp(movedRef.current.x + (seeded(attempt + dodgesRef.current, 2.3) * 2 - 1) * 150, -maxX, maxX);
-      const candidateY = clamp(movedRef.current.y + (seeded(attempt + dodgesRef.current, 4.7) * 2 - 1) * 78, -maxY, maxY);
-      const dx = candidateX - movedRef.current.x;
-      const dy = candidateY - movedRef.current.y;
-      if (Math.abs(dx) < 18 && Math.abs(dy) < 18) continue;
-
-      const prospective = {
-        left: noRect.left + dx,
-        top: noRect.top + dy,
-        right: noRect.right + dx,
-        bottom: noRect.bottom + dy,
-      };
-      const overlapsYes =
-        prospective.right > yesRect.left - 14 &&
-        prospective.left < yesRect.right + 14 &&
-        prospective.bottom > yesRect.top - 14 &&
-        prospective.top < yesRect.bottom + 14;
-
-      if (!best) best = { x: candidateX, y: candidateY, overlaps: overlapsYes };
-      if (!overlapsYes) {
-        best = { x: candidateX, y: candidateY, overlaps: false };
-        break;
-      }
-    }
-
-    if (!best) return;
-    movedRef.current = { x: best.x, y: best.y };
-    noX.set(best.x);
-    noY.set(best.y);
     dodgesRef.current += 1;
     setDodges(dodgesRef.current);
+    setPressedNo(true);
     setMessage(
       dodgesRef.current >= MAX_DODGES
         ? PROPOSAL_COPY.settled
         : PROPOSAL_COPY.dodges[Math.min(dodgesRef.current - 1, PROPOSAL_COPY.dodges.length - 1)],
     );
-  }, [noX, noY]);
+  }, []);
 
-  function handleNoAttempt() {
+  // A tap on a fleeing button counts the same as a hover.
+  function handleGiveUp() {
     setPressedNo(true);
-    if (dodgesRef.current < 2) {
-      dodge();
+    if (dodgesRef.current >= MAX_DODGES - 1) {
+      decline();
       return;
     }
-    decline();
+    handleWander();
   }
 
   function decline() {
     if (chosen) return;
     setChosen(true);
     setView('declined');
+    setWandering(false);
     void recordAnswer('no');
   }
 
@@ -140,18 +86,15 @@ export function ProposalScreen({
     void recordAnswer('yes');
   }
 
-  const particles = useMemo(() => {
-    return Array.from({ length: reduce ? 8 : 26 }, (_, index) => ({
-      id: index,
-      left: seeded(index + 1, 1.7) * 100,
-      delay: seeded(index + 1, 2.9) * 0.8,
-      duration: 2 + seeded(index + 1, 3.7) * 1.6,
-      size: 10 + seeded(index + 1, 5.1) * 18,
-      drift: (seeded(index + 1, 6.3) - 0.5) * 160,
-      type: index % 3 === 0 ? 'petal' : 'heart',
-      rotate: seeded(index + 1, 7.7) * 220,
-    }));
-  }, [reduce]);
+  // The No button only starts roaming when she has actually seen the question.
+  useEffect(() => {
+    if (view !== 'question' || alreadyAccepted || reduce) {
+      setWandering(false);
+      return;
+    }
+    const timer = setTimeout(() => setWandering(true), 1500);
+    return () => clearTimeout(timer);
+  }, [view, alreadyAccepted, reduce]);
 
   return (
     <section className="relative flex min-h-[100svh] flex-col overflow-hidden dusk-bg">
@@ -200,38 +143,31 @@ export function ProposalScreen({
                 </div>
               ) : (
                 <>
-                  <div
-                    ref={wrapRef}
-                    className="relative mt-9 flex w-full max-w-[32rem] flex-wrap items-center justify-center gap-4 pb-2 pt-2"
-                  >
-                    <button
-                      ref={yesRef}
-                      type="button"
-                      onClick={accept}
-                      disabled={celebrating}
-                      className="btn btn-primary relative min-w-[13.5rem] px-8 py-4 text-[0.9rem] tracking-[0.1em]"
-                      style={{ animation: 'heartbeat 2.8s ease-in-out infinite' }}
-                    >
-                      <Heart className="h-4 w-4" strokeWidth={1.6} fill="currentColor" />
-                      {PROPOSAL_COPY.yes}
-                    </button>
+                  <div className="relative mt-9 flex w-full flex-col items-center justify-center gap-4">
+                    <span className="yes-pulse relative inline-flex">
+                      <span className="yes-glow" aria-hidden />
+                      <motion.button
+                        ref={yesRef}
+                        type="button"
+                        onClick={accept}
+                        disabled={celebrating}
+                        whileHover={reduce ? undefined : { scale: 1.025 }}
+                        whileTap={reduce ? undefined : { scale: 0.985 }}
+                        className="btn btn-primary relative min-w-[13.5rem] px-8 py-4 text-[0.9rem] tracking-[0.1em]"
+                      >
+                        <Heart className="h-4 w-4" strokeWidth={1.6} fill="currentColor" />
+                        {PROPOSAL_COPY.yes}
+                      </motion.button>
+                    </span>
 
-                    <motion.button
-                      ref={noRef}
-                      type="button"
-                      style={{ x: noSpringX, y: noSpringY }}
-                      onPointerEnter={(event) => {
-                        if (event.pointerType === 'mouse' && !settled) dodge();
-                      }}
-                      onFocus={() => {
-                        /* keyboard users are never chased */
-                      }}
-                      onClick={handleNoAttempt}
-                      className="btn btn-ghost-dusk relative min-w-[10.5rem] px-6 py-3.5 text-[0.8rem] tracking-[0.1em]"
-                      aria-describedby="no-hint"
-                    >
-                      {PROPOSAL_COPY.no}
-                    </motion.button>
+                    <WanderingNo
+                      label={PROPOSAL_COPY.no}
+                      onGiveUp={handleGiveUp}
+                      onDecline={decline}
+                      yesRef={yesRef}
+                      wandering={wandering && !settled && !celebrating}
+                      onWander={handleWander}
+                    />
                   </div>
 
                   <div className="mt-3 min-h-[2.6rem] max-w-[26rem]" aria-live="polite">
@@ -250,7 +186,7 @@ export function ProposalScreen({
                     </AnimatePresence>
                     <span id="no-hint" className="sr-only">
                       {pressedNo && !settled
-                        ? 'Press again if you would really rather not.'
+                        ? 'Press it again if you would really rather not.'
                         : 'You can decline if you would like to.'}
                     </span>
                   </div>
@@ -338,68 +274,7 @@ export function ProposalScreen({
         <CoupleArt className="w-full" />
       </div>
 
-      <AnimatePresence>
-        {celebrating && (
-          <motion.div
-            className="pointer-events-none fixed inset-0 z-50 overflow-hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            aria-hidden
-          >
-            <div
-              className="absolute inset-0"
-              style={{ background: 'radial-gradient(60% 50% at 50% 45%, rgba(255,214,206,0.16), transparent 70%)' }}
-            />
-            {particles.map((particle) => (
-              <motion.span
-                key={particle.id}
-                initial={{ opacity: 0, y: '-10vh', x: 0, rotate: 0 }}
-                animate={{
-                  opacity: [0, 1, 1, 0],
-                  y: '112vh',
-                  x: particle.drift,
-                  rotate: particle.rotate,
-                }}
-                transition={{
-                  duration: particle.duration,
-                  delay: particle.delay,
-                  ease: 'easeIn',
-                }}
-                className="absolute top-0"
-                style={{ left: `${particle.left}%` }}
-              >
-                {particle.type === 'heart' ? (
-                  <Heart
-                    style={{ width: particle.size, height: particle.size }}
-                    className="text-[#F0B9B0]"
-                    fill="currentColor"
-                    strokeWidth={0}
-                  />
-                ) : (
-                  <span
-                    className="block"
-                    style={{
-                      width: particle.size,
-                      height: particle.size * 0.7,
-                      background: 'linear-gradient(135deg, rgba(247,214,208,0.95), rgba(214,138,152,0.75))',
-                      borderRadius: '60% 40% 55% 45% / 55% 55% 45% 45%',
-                    }}
-                  />
-                )}
-              </motion.span>
-            ))}
-            <motion.p
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: [0, 1, 1], scale: 1 }}
-              transition={{ duration: 1.4, times: [0, 0.3, 1] }}
-              className="absolute inset-x-0 top-[42%] text-center script text-[2.6rem] text-[#FFF1EA] sm:text-[3.4rem]"
-            >
-              She said yes.
-            </motion.p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <Celebration show={celebrating} />
     </section>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
-import { motion, useReducedMotion } from 'framer-motion';
+import { useRef } from 'react';
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { FLOWERS_COPY, POEM_STANZAS, POEM_TITLE } from '@/lib/content';
 import { Ambience } from './ambience';
@@ -9,9 +10,12 @@ import { Ornament } from './ornaments';
 
 export function FlowersScreen({ onContinue }: { onContinue: () => void }) {
   const reduce = useReducedMotion();
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] });
+  const bouquetLift = useTransform(scrollYProgress, [0, 1], [0, -46]);
 
   return (
-    <section className="relative flex min-h-[100svh] flex-col overflow-hidden garden-bg">
+    <section ref={sectionRef} className="relative flex min-h-[100svh] flex-col overflow-hidden garden-bg">
       <Ambience tone="garden" hearts={false} petals />
 
       <div className="relative z-10 mx-auto w-full max-w-3xl px-5 py-14 sm:px-8 sm:py-20">
@@ -27,6 +31,7 @@ export function FlowersScreen({ onContinue }: { onContinue: () => void }) {
             initial={reduce ? undefined : { opacity: 0, scale: 0.92, y: 26, rotate: -2.5 }}
             animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
             transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1], delay: 0.15 }}
+            style={reduce ? undefined : { y: bouquetLift }}
             className="relative mt-3 w-[210px] sm:mt-4 sm:w-[268px]"
           >
             <div

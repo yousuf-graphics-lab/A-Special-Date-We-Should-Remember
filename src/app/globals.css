@@ -480,6 +480,201 @@ audio {
   height: 40px;
 }
 
+/* --------------------------------------------------------------------------
+   Floral touch ripples, bursts and the screen-to-screen veil
+   -------------------------------------------------------------------------- */
+.bloom-ripple {
+  position: absolute;
+  width: var(--bloom-size, 32px);
+  height: var(--bloom-size, 32px);
+  transform: translate(-50%, -50%);
+  will-change: transform, opacity;
+}
+
+.bloom-flower {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: bloom-open 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  filter: drop-shadow(0 4px 10px rgba(150, 74, 92, 0.22));
+}
+
+.bloom-halo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 120px;
+  height: 120px;
+  margin: -60px 0 0 -60px;
+  border-radius: 999px;
+  background: radial-gradient(closest-side, rgba(246, 221, 225, 0.7), rgba(246, 221, 225, 0));
+  animation: bloom-halo 1.15s ease-out forwards;
+}
+
+.bloom-petal {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--petal-size, 9px);
+  height: calc(var(--petal-size, 9px) * 0.72);
+  border-radius: 60% 40% 55% 45% / 55% 55% 45% 45%;
+  transform: translate(-50%, -50%);
+  animation: bloom-petal-away 1.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  opacity: 0;
+}
+
+@keyframes bloom-open {
+  0% {
+    transform: rotate(var(--bloom-rotation, 0deg)) scale(0.15);
+    opacity: 0;
+  }
+  22% {
+    opacity: 0.95;
+  }
+  55% {
+    transform: rotate(calc(var(--bloom-rotation, 0deg) + 14deg)) scale(var(--bloom-scale, 1));
+    opacity: 0.9;
+  }
+  100% {
+    transform: rotate(calc(var(--bloom-rotation, 0deg) + 26deg)) scale(calc(var(--bloom-scale, 1) * 1.12));
+    opacity: 0;
+  }
+}
+
+@keyframes bloom-halo {
+  0% {
+    transform: scale(0.25);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+@keyframes bloom-petal-away {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(0.7);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--petal-dx, 0px)), calc(-50% + var(--petal-dy, 0px)))
+      rotate(var(--petal-spin, 90deg)) scale(0.35);
+    opacity: 0;
+  }
+}
+
+/* A bloom that opens from a point — used for celebrations and reveals */
+.burst-halo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 240px;
+  height: 240px;
+  margin: -120px 0 0 -120px;
+  border-radius: 999px;
+  background: radial-gradient(closest-side, rgba(255, 236, 226, 0.5), rgba(255, 236, 226, 0));
+  animation: burst-halo 2.4s ease-out forwards;
+}
+
+.burst-flower {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--b-size, 48px);
+  height: var(--b-size, 48px);
+  margin: calc(var(--b-size, 48px) / -2) 0 0 calc(var(--b-size, 48px) / -2);
+  animation: burst-flower 2.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  filter: drop-shadow(0 6px 14px rgba(120, 60, 78, 0.25));
+}
+
+@keyframes burst-halo {
+  0% {
+    transform: scale(0.2);
+    opacity: 0.7;
+  }
+  60% {
+    opacity: 0.35;
+  }
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+
+@keyframes burst-flower {
+  0% {
+    transform: translate(0, 0) rotate(var(--b-rot, 0deg)) scale(0.2);
+    opacity: 0;
+  }
+  28% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(var(--bx, 0px), var(--by, 0px)) rotate(calc(var(--b-rot, 0deg) + 40deg)) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Petals carried across the screen while one chapter turns into the next */
+.veil-petal {
+  position: absolute;
+  top: -12%;
+  border-radius: 60% 40% 55% 45% / 55% 55% 45% 45%;
+  background: linear-gradient(140deg, rgba(251, 228, 232, 0.95), rgba(214, 154, 168, 0.8));
+  animation: veil-drift var(--veil-duration, 1.1s) cubic-bezier(0.33, 0.9, 0.4, 1) forwards;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+@keyframes veil-drift {
+  0% {
+    transform: translate3d(0, -10vh, 0) rotate(0deg) scale(0.7);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate3d(var(--veil-x, 6vw), 112vh, 0) rotate(var(--veil-spin, 160deg)) scale(1);
+    opacity: 0;
+  }
+}
+
+.veil-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 40% at 50% 45%, rgba(255, 246, 240, 0.75), rgba(255, 246, 240, 0) 70%),
+    radial-gradient(70% 50% at 50% 100%, rgba(247, 237, 227, 0.6), rgba(247, 237, 227, 0) 72%);
+  animation: veil-glow 0.95s ease-out forwards;
+}
+
+@keyframes veil-glow {
+  0% {
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bloom-ripple,
+  .burst-flower,
+  .burst-halo,
+  .veil-petal {
+    display: none;
+  }
+}
+
 /* Accessibility: honour reduced motion globally */
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -499,5 +694,62 @@ audio {
 @media print {
   .no-print {
     display: none !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   The yes button: a living pulse and a halo that breathes with it
+   -------------------------------------------------------------------------- */
+.yes-pulse {
+  animation: heartbeat 3.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  animation-delay: 0.6s;
+}
+
+@keyframes heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  12% {
+    transform: scale(1.045);
+  }
+  24% {
+    transform: scale(1.005);
+  }
+  36% {
+    transform: scale(1.03);
+  }
+  50% {
+    transform: scale(1);
+  }
+}
+
+.yes-glow {
+  position: absolute;
+  inset: -18% -14%;
+  z-index: 0;
+  border-radius: 9999px;
+  background: radial-gradient(closest-side, rgba(247, 205, 196, 0.55), rgba(247, 205, 196, 0.16) 58%, transparent 78%);
+  filter: blur(12px);
+  animation: yes-breathe 4.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes yes-breathe {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.97);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .yes-pulse,
+  .yes-glow {
+    animation: none;
   }
 }

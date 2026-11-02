@@ -19,6 +19,7 @@ import type { PublicDateResponse } from '@/lib/responses';
 import { formatCalendarDate, formatDuration, formatTimeLabel } from '@/lib/time';
 import { Ambience } from './ambience';
 import { Ornament } from './ornaments';
+import { BloomBurst } from './bloom';
 
 export function ThankYouScreen({
   response,
@@ -88,6 +89,8 @@ export function ThankYouScreen({
       <Ambience tone="dusk" hearts petals />
 
       <div className="relative z-10 mx-auto w-full max-w-3xl px-5 py-16 sm:px-8 sm:py-20">
+        {revealed && <BloomBurst count={9} tone="dusk" className="left-1/2 top-16 h-0 w-0" />}
+
         {/* the envelope opening, as a quiet opening scene */}
         <div className="flex flex-col items-center">
           <AnimatePresence>

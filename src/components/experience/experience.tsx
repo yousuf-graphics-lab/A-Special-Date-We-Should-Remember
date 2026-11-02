@@ -15,6 +15,8 @@ import { PlannerScreen } from './planner-screen';
 import { ThankYouScreen } from './thank-you-screen';
 import { MusicControl, MusicProvider } from './music';
 import { Progress } from './progress';
+import { TouchBloom } from './bloom';
+import { StageVeil } from './stage-veil';
 
 function LoadingVeil() {
   return (
@@ -40,6 +42,15 @@ export function Experience() {
   const [saved, setSaved] = useState<PublicDateResponse | null>(null);
   const reduce = useReducedMotion();
   const mainRef = useRef<HTMLDivElement>(null);
+
+  // One soft beat every time a chapter turns into the next.
+  const prevStage = useRef<StageId>('lock');
+  const [beat, setBeat] = useState(0);
+  useEffect(() => {
+    if (prevStage.current === stage) return;
+    prevStage.current = stage;
+    setBeat((count) => count + 1);
+  }, [stage]);
 
   useEffect(() => {
     let cancelled = false;
@@ -209,6 +220,9 @@ export function Experience() {
         </main>
 
         <MusicControl tone={tone} />
+
+        <StageVeil trigger={beat} tone={tone} />
+        <TouchBloom />
       </div>
     </MusicProvider>
   );

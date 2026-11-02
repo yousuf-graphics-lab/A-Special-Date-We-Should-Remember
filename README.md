@@ -15,12 +15,16 @@ Written for **Samiya**, by **Yousuf**, with all his heart.
 | **The Secret** | A heart-shaped lock. She unlocks it with her birthday (`14.11.2007`, `14112007` or `14-11-2007`). The wrong answer gently says *“Hmm, not quite, my love. Try once more.”* |
 | **My Letter** | A sealed envelope with her name and a wax seal. Tapping the seal opens the letter, exactly as written. |
 | **Flowers and Poetry** | The bouquet blooms in, the poem appears stanza by stanza, in Banglish, verbatim. |
-| **The Question** | Evening sky, moonlight, two silhouettes on a bench. The **Yes** button breathes; the **No** button playfully steps aside three times, then always lets her decline. |
+| **The Question** | Evening sky, moonlight, two silhouettes on a bench. The **Yes** button breathes; the **No** button wanders anywhere on the screen for three playful hops, then stays put so she can always decline. |
 | **Our Date** | Calendar (future days only), time slots plus a custom time, date preferences, an optional note, an optional voice message, up to five optional photos, and an optional location. |
 | **A Little Thank You** | The second letter, then a card with exactly what she submitted — empty sections are simply omitted. |
 
 A quiet gold progress indicator lets her step back to anything she has already seen. Music starts
 after her first tap and keeps playing across screens.
+
+Every touch leaves a small hand-drawn blossom behind, each chapter turns under a soft curtain of
+petals, and **Yes** opens a full-screen bloom before the next screen arrives. All of it disappears
+under `prefers-reduced-motion`, and none of it ever sits between her and a button.
 
 ### Optional sharing — never required
 
