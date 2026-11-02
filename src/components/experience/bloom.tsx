@@ -251,7 +251,7 @@ export function BloomBurst({
   );
 
   return (
-    <div className={clsx('pointer-events-none absolute inset-0', className)} aria-hidden>
+    <div className={clsx('pointer-events-none absolute', className ?? 'inset-0')} aria-hidden>
       <BloomDefs />
       <span className="burst-halo" />
       {flowers.map((flower) => (

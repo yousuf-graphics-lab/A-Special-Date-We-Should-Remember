@@ -15,7 +15,7 @@ Written for **Samiya**, by **Yousuf**, with all his heart.
 | **The Secret** | A heart-shaped lock. She unlocks it with her birthday (`14.11.2007`, `14112007` or `14-11-2007`). The wrong answer gently says *“Hmm, not quite, my love. Try once more.”* |
 | **My Letter** | A sealed envelope with her name and a wax seal. Tapping the seal opens the letter, exactly as written. |
 | **Flowers and Poetry** | The bouquet blooms in, the poem appears stanza by stanza, in Banglish, verbatim. |
-| **The Question** | Evening sky, moonlight, two silhouettes on a bench. The **Yes** button breathes; the **No** button wanders anywhere on the screen for three playful hops, then stays put so she can always decline. |
+| **The Question** | Evening sky, moonlight, two silhouettes on a bench. The **Yes** button breathes; the **No** button wanders anywhere on the screen — each tap is a playful hop with a message, and the third tap always lets her decline. |
 | **Our Date** | Calendar (future days only), time slots plus a custom time, date preferences, an optional note, an optional voice message, up to five optional photos, and an optional location. |
 | **A Little Thank You** | The second letter, then a card with exactly what she submitted — empty sections are simply omitted. |
 

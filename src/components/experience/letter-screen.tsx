@@ -7,10 +7,18 @@ import { LETTER_ONE } from '@/lib/content';
 import { Ambience } from './ambience';
 import { WaxSeal } from './heart-lock';
 import { Ornament } from './ornaments';
+import { BloomBurst } from './bloom';
 
 export function LetterScreen({ onContinue }: { onContinue: () => void }) {
   const [opened, setOpened] = useState(false);
+  const [blooming, setBlooming] = useState(false);
   const reduce = useReducedMotion();
+
+  function openLetter() {
+    setOpened(true);
+    setBlooming(true);
+    setTimeout(() => setBlooming(false), 1600);
+  }
 
   return (
     <section className="relative flex min-h-[100svh] flex-col overflow-hidden day-bg">
@@ -119,7 +127,7 @@ export function LetterScreen({ onContinue }: { onContinue: () => void }) {
                     {/* seal */}
                     <button
                       type="button"
-                      onClick={() => setOpened(true)}
+                      onClick={openLetter}
                       className="group absolute left-1/2 top-[64%] z-30 -translate-x-1/2 -translate-y-1/2 rounded-full transition-transform duration-500 hover:scale-[1.06] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wine/50 focus-visible:ring-offset-4 focus-visible:ring-offset-[#f4ddcd]"
                       aria-label="Open the letter"
                     >
@@ -141,6 +149,8 @@ export function LetterScreen({ onContinue }: { onContinue: () => void }) {
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
               className="paper w-full max-w-[43rem] rounded-[6px] px-6 py-9 sm:px-11 sm:py-12 md:px-14 md:py-14"
             >
+              {blooming && <BloomBurst count={8} className="left-1/2 top-12 h-0 w-0" />}
+
               <div className="pointer-events-none absolute inset-[10px] rounded-[3px] border border-gold/25" aria-hidden />
 
               <div className="relative">
