@@ -33,7 +33,6 @@ function LoadingVeil() {
 
 export function Experience() {
   const [ready, setReady] = useState(false);
-  const [showVeil, setShowVeil] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const [stage, setStage] = useState<StageId>('lock');
   const [visited, setVisited] = useState<StageId[]>(['lock']);
@@ -62,9 +61,6 @@ export function Experience() {
 
     const targetStage: StageId = persisted.stage === 'lock' ? 'letter' : persisted.stage;
     setStage(targetStage);
-    const needsData = Boolean(persisted.token) && (targetStage === 'thanks' || targetStage === 'plan');
-    if (needsData) setShowVeil(true);
-
     if (persisted.token) {
       void loadSavedResponse(persisted.token)
         .then((response) => {
@@ -72,9 +68,7 @@ export function Experience() {
           if (response) setSaved(response);
         })
         .finally(() => {
-          if (cancelled) return;
-          setShowVeil(false);
-          setReady(true);
+          if (!cancelled) setReady(true);
         });
     } else {
       setReady(true);
@@ -129,7 +123,9 @@ export function Experience() {
 
   const tone = stage === 'proposal' || stage === 'thanks' ? 'dusk' : 'day';
 
-  if (!ready && showVeil) return <LoadingVeil />;
+  // A single soft beat while we remember where she left off — so the lock
+  // screen never flashes for someone who has already unlocked the story.
+  if (!ready) return <LoadingVeil />;
 
   return (
     <MusicProvider>
